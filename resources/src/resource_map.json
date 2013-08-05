@@ -1,9 +1,14 @@
 {
     "media": [
         {
-            "defName": "DUMMY",
-            "type": "raw",
-            "file": "resource_map.json"
+            "defName": "MINUTE_ROTOR",
+            "type": "png",
+            "file": "images/Minute_Rotor.png"
+        },
+        {
+            "defName": "HOUR_ROTOR",
+            "type": "png",
+            "file": "images/Hour_Rotor.png"
         }
     ],
     "friendlyVersion": "VERSION",
