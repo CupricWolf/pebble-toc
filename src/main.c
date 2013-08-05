@@ -18,6 +18,8 @@ PBL_APP_INFO(MY_UUID,
 
 Window window;
 
+BmpContainer background_image_container;
+
 RotBmpContainer hour_hand_image_container;
 RotBmpContainer minute_hand_image_container;
 
@@ -139,23 +141,29 @@ void handle_init(AppContextRef ctx) {
   window_stack_push(&window, true);
 
   resource_init_current_app(&APP_RESOURCES);
+  
+  //set up a layer for the background.
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_MASK, &background_image_container);
+  layer_add_child(&window.layer, &background_image_container.layer.layer);
 
   // Set up a layer for the hour hand
-  rotbmp_init_container(RESOURCE_ID_IMAGE_HOUR_ROTOR, &hour_hand_image_container);
+  //rotbmp_init_container(RESOURCE_ID_IMAGE_HOUR_ROTOR, &hour_hand_image_container);
+  rotbmp_init_container(RESOURCE_ID_IMAGE_HAND_ROTOR_2, &hour_hand_image_container);
 
-  hour_hand_image_container.layer.compositing_mode = GCompOpAssign;
+  hour_hand_image_container.layer.compositing_mode = GCompOpAnd;
 
-  rot_bitmap_set_src_ic(&hour_hand_image_container.layer, GPoint(84, 84));
+  rot_bitmap_set_src_ic(&hour_hand_image_container.layer, GPoint(111, 111));
 
   layer_add_child(&window.layer, &hour_hand_image_container.layer.layer);
 
 
   // Set up a layer for the minute hand
-  rotbmp_init_container(RESOURCE_ID_IMAGE_MINUTE_ROTOR, &minute_hand_image_container);
+  //rotbmp_init_container(RESOURCE_ID_IMAGE_MINUTE_ROTOR, &minute_hand_image_container);
+  rotbmp_init_container(RESOURCE_ID_IMAGE_HAND_ROTOR, &minute_hand_image_container);
 
-  minute_hand_image_container.layer.compositing_mode = GCompOpAssign;
+  minute_hand_image_container.layer.compositing_mode = GCompOpOr;
 
-  rot_bitmap_set_src_ic(&minute_hand_image_container.layer, GPoint(84, 84));
+  rot_bitmap_set_src_ic(&minute_hand_image_container.layer, GPoint(111, 111));
 
   layer_add_child(&window.layer, &minute_hand_image_container.layer.layer);
 

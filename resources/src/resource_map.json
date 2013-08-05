@@ -1,14 +1,19 @@
 {
     "media": [
         {
-            "defName": "IMAGE_HOUR_ROTOR",
+            "defName": "IMAGE_HAND_ROTOR_2",
             "type": "png",
-            "file": "images/Hour_Rotor.png"
+            "file": "images/Rotor2.png"
         },
         {
-            "defName": "IMAGE_MINUTE_ROTOR",
+            "defName": "IMAGE_BACKGROUND_MASK",
             "type": "png",
-            "file": "images/Minute_Rotor.png"
+            "file": "images/Background_Mask.png"
+        },
+        {
+            "defName": "IMAGE_HAND_ROTOR",
+            "type": "png",
+            "file": "images/Rotor.png"
         }
     ],
     "friendlyVersion": "VERSION",
