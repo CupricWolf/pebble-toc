@@ -1,12 +1,12 @@
 {
     "media": [
         {
-            "defName": "RESOURCE_ID_IMAGE_HOUR_ROTOR",
+            "defName": "IMAGE_HOUR_ROTOR",
             "type": "png",
             "file": "images/Hour_Rotor.png"
         },
         {
-            "defName": "RESOURCE_ID_IMAGE_MINUTE_ROTOR",
+            "defName": "IMAGE_MINUTE_ROTOR",
             "type": "png",
             "file": "images/Minute_Rotor.png"
         }
