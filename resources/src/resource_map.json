@@ -1,14 +1,14 @@
 {
     "media": [
         {
-            "defName": "RESOURCE_IMAGE_MINUTE_ROTOR",
-            "type": "png",
-            "file": "images/Minute_Rotor.png"
-        },
-        {
             "defName": "RESOURCE_IMAGE_HOUR_ROTOR",
             "type": "png-trans",
             "file": "images/Hour_Rotor.png"
+        },
+        {
+            "defName": "RESOURCE_IMAGE_MINUTE_ROTOR",
+            "type": "png",
+            "file": "images/Minute_Rotor.png"
         }
     ],
     "friendlyVersion": "VERSION",
