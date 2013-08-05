@@ -21,7 +21,6 @@ Window window;
 RotBmpContainer hour_hand_image_container;
 RotBmpContainer minute_hand_image_container;
 
-RotBmpPairContainer center_circle_image_container;
 
 /* -------------- TODO: Remove this and use Public API ! ------------------- */
 
@@ -134,28 +133,29 @@ void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t) {
 
 
 void handle_init(AppContextRef ctx) {
-
+  (void)ctx;
+	
   window_init(&window, "Pebble-Toc Watch");
   window_stack_push(&window, true);
 
   resource_init_current_app(&APP_RESOURCES);
 
   // Set up a layer for the hour hand
-  rotbmp_init_container(RESOURCE_IMAGE_HOUR_ROTOR, &hour_hand_image_container);
+  rotbmp_init_container(RESOURCE_ID_IMAGE_HOUR_ROTOR, &hour_hand_image_container);
 
-  hour_hand_image_container.layer.compositing_mode = GCompOpClear;
+  hour_hand_image_container.layer.compositing_mode = GCompOpAssign;
 
-  rot_bitmap_set_src_ic(&hour_hand_image_container.layer, GPoint(4, 44));
+  rot_bitmap_set_src_ic(&hour_hand_image_container.layer, GPoint(84, 84));
 
   layer_add_child(&window.layer, &hour_hand_image_container.layer.layer);
 
 
   // Set up a layer for the minute hand
-  rotbmp_init_container(RESOURCE_IMAGE_MINUTE_ROTOR, &minute_hand_image_container);
+  rotbmp_init_container(RESOURCE_ID_IMAGE_MINUTE_ROTOR, &minute_hand_image_container);
 
-  minute_hand_image_container.layer.compositing_mode = GCompOpClear;
+  minute_hand_image_container.layer.compositing_mode = GCompOpAssign;
 
-  rot_bitmap_set_src_ic(&minute_hand_image_container.layer, GPoint(4, 66));
+  rot_bitmap_set_src_ic(&minute_hand_image_container.layer, GPoint(84, 84));
 
   layer_add_child(&window.layer, &minute_hand_image_container.layer.layer);
 
