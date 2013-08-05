@@ -7,7 +7,7 @@
         },
         {
             "defName": "RESOURCE_IMAGE_HOUR_ROTOR",
-            "type": "png",
+            "type": "png-trans",
             "file": "images/Hour_Rotor.png"
         }
     ],
