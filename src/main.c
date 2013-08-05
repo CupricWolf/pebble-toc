@@ -176,8 +176,7 @@ void handle_init(AppContextRef ctx) {
 }
 
 void handle_deinit(AppContextRef ctx) {
-
-  bmp_deinit_container(&background_image_container);
+	
   rotbmp_deinit_container(&hour_hand_image_container);
   rotbmp_deinit_container(&minute_hand_image_container);
   //rotbmp_pair_deinit_container(&center_circle_image_container);
