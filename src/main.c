@@ -1,9 +1,3 @@
-/*
-
-  A watch face used as an experiment on making a watch face. Styled after my favorite analog watch.
-
- */
-
 #include "pebble_os.h"
 #include "pebble_app.h"
 #include "pebble_fonts.h"
@@ -13,189 +7,85 @@
 PBL_APP_INFO(MY_UUID,
              "Pebble-Toc", "Happydude11209",
              1, 0, /* App version */
-             DEFAULT_MENU_ICON,
+             RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
 Window window;
 
 BmpContainer background_image_container;
 
-RotBmpContainer hour_hand_image_container;
-RotBmpContainer minute_hand_image_container;
+RotBmpPairContainer minute_hand_image_container;
+RotBmpPairContainer hour_hand_image_container;
 
+void update_watch(PblTm* t){
 
-/* -------------- TODO: Remove this and use Public API ! ------------------- */
+minute_hand_image_container.layer.white_layer.rotation = TRIG_MAX_ANGLE * (t->tm_min * 6) / 360;
+minute_hand_image_container.layer.black_layer.rotation = TRIG_MAX_ANGLE * (t->tm_min * 6) / 360;
+minute_hand_image_container.layer.layer.frame.origin.x = (144/2) - (minute_hand_image_container.layer.layer.frame.size.w/2);
+minute_hand_image_container.layer.layer.frame.origin.y = (168/2) - (minute_hand_image_container.layer.layer.frame.size.h/2);
+layer_mark_dirty(&minute_hand_image_container.layer.layer);	
 
-// from src/core/util/misc.h
+hour_hand_image_container.layer.white_layer.rotation = TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 30) + (t->tm_min/2)) / 360;
+hour_hand_image_container.layer.black_layer.rotation = TRIG_MAX_ANGLE * (((t->tm_hour % 12) * 30) + (t->tm_min/2)) / 360;
+hour_hand_image_container.layer.layer.frame.origin.x = (144/2) - (hour_hand_image_container.layer.layer.frame.size.w/2);
+hour_hand_image_container.layer.layer.frame.origin.y = (168/2) - (hour_hand_image_container.layer.layer.frame.size.h/2);
+layer_mark_dirty(&hour_hand_image_container.layer.layer);
 
-#define MAX(a,b) (((a)>(b))?(a):(b))
-
-// From src/fw/ui/rotate_bitmap_layer.c
-
-//! newton's method for floor(sqrt(x)) -> should always converge
-static int32_t integer_sqrt(int32_t x) {
-  if (x < 0) {
-    ////    PBL_LOG(LOG_LEVEL_ERROR, "Looking for sqrt of negative number");
-    return 0;
-  }
-
-  int32_t last_res = 0;
-  int32_t res = (x + 1)/2;
-  while (last_res != res) {
-    last_res = res;
-    res = (last_res + x / last_res) / 2;
-  }
-  return res;
 }
 
-void rot_bitmap_set_src_ic(RotBitmapLayer *image, GPoint ic) {
-  image->src_ic = ic;
-
-  // adjust the frame so the whole image will still be visible
-  const int32_t horiz = MAX(ic.x, abs(image->bitmap->bounds.size.w - ic.x));
-  const int32_t vert = MAX(ic.y, abs(image->bitmap->bounds.size.h - ic.y));
-
-  GRect r = layer_get_frame(&image->layer);
-  //// const int32_t new_dist = integer_sqrt(horiz*horiz + vert*vert) * 2;
-  const int32_t new_dist = (integer_sqrt(horiz*horiz + vert*vert) * 2) + 1; //// Fudge to deal with non-even dimensions--to ensure right-most and bottom-most edges aren't cut off.
-
-  r.size.w = new_dist;
-  r.size.h = new_dist;
-  layer_set_frame(&image->layer, r);
-
-  r.origin = GPoint(0, 0);
-  ////layer_set_bounds(&image->layer, r);
-  image->layer.bounds = r;
-
-  image->dest_ic = GPoint(new_dist / 2, new_dist / 2);
-
-  layer_mark_dirty(&(image->layer));
-}
-
-/* ------------------------------------------------------------------------- */
-
-void set_hand_angle(RotBmpContainer *hand_image_container, unsigned int hand_angle) {
-
-  signed short x_fudge = 0;
-  signed short y_fudge = 0;
-
-
-  hand_image_container->layer.rotation =  TRIG_MAX_ANGLE * hand_angle / 360;
-
-  //
-  // Due to rounding/centre of rotation point/other issues of fitting
-  // square pixels into round holes by the time hands get to 6 and 9
-  // o'clock there's off-by-one pixel errors.
-  //
-  // The `x_fudge` and `y_fudge` values enable us to ensure the hands
-  // look centred on the minute marks at those points. (This could
-  // probably be improved for intermediate marks also but they're not
-  // as noticable.)
-  //
-  // I think ideally we'd only ever calculate the rotation between
-  // 0-90 degrees and then rotate again by 90 or 180 degrees to
-  // eliminate the error.
-  //
-  if (hand_angle == 180) {
-    x_fudge = -1;
-  } else if (hand_angle == 270) {
-    y_fudge = -1;
-  }
-
-  // (144 = screen width, 168 = screen height)
-  hand_image_container->layer.layer.frame.origin.x = (144/2) - (hand_image_container->layer.layer.frame.size.w/2) + x_fudge;
-  hand_image_container->layer.layer.frame.origin.y = (168/2) - (hand_image_container->layer.layer.frame.size.h/2) + y_fudge;
-
-  layer_mark_dirty(&hand_image_container->layer.layer);
-}
-
-
-void update_hand_positions() {
-
-  PblTm t;
-
-  get_time(&t);
-
-  set_hand_angle(&hour_hand_image_container, ((t.tm_hour % 12) * 30) + (t.tm_min/2)); // ((((t.tm_hour % 12) * 6) + (t.tm_min / 10))) / (12 * 6));
-
-  set_hand_angle(&minute_hand_image_container, t.tm_min * 6);
-}
-
+// Called once per second
 void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t) {
-
-  update_hand_positions(); // TODO: Pass tick event
+update_watch(t->tick_time);
 }
 
-//void handle_init(AppContextRef ctx) {
-//  (void)ctx;
-//
-//  window_init(&window, "Window Name");
-//  window_stack_push(&window, true /* Animated */);
-//}
 
+// Handle the start-up of the app
+void handle_init(AppContextRef app_ctx) {
 
-void handle_init(AppContextRef ctx) {
-  (void)ctx;
-	
-  window_init(&window, "Pebble-Toc Watch");
-  window_stack_push(&window, true);
+// Create our app's base window
+window_init(&window, "Trails Watch");
+window_stack_push(&window, true);
+window_set_background_color(&window, GColorBlack);
 
-  resource_init_current_app(&APP_RESOURCES);
-  
-  //set up a layer for the background.
-  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_MASK, &background_image_container);
-  layer_add_child(&window.layer, &background_image_container.layer.layer);
+resource_init_current_app(&APP_RESOURCES);
 
-  // Set up a layer for the hour hand
-  //rotbmp_init_container(RESOURCE_ID_IMAGE_HOUR_ROTOR, &hour_hand_image_container);
-  rotbmp_init_container(RESOURCE_ID_IMAGE_HAND_ROTOR_2, &hour_hand_image_container);
+// Set up a layer for the static watch face background
+bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND, &background_image_container);
+layer_add_child(&window.layer, &background_image_container.layer.layer);
 
-  hour_hand_image_container.layer.compositing_mode = GCompOpAnd;
+// Set up a layer for the minute hand with transparency, ensure the source image has a transparent area
+rotbmp_pair_init_container(RESOURCE_ID_IMAGE_MINUTE_ROTOR_WHITE, RESOURCE_ID_IMAGE_MINUTE_ROTOR_BLACK, &minute_hand_image_container);
+rotbmp_pair_layer_set_src_ic(&minute_hand_image_container.layer, GPoint(111, 111));
+layer_add_child(&window.layer, &minute_hand_image_container.layer.layer);	
 
-  rot_bitmap_set_src_ic(&hour_hand_image_container.layer, GPoint(111, 111));
+// Set up a layer for the hour hand with transparency, ensure the source image has a transparent area
+rotbmp_pair_init_container(RESOURCE_ID_IMAGE_HOUR_ROTOR_WHITE, RESOURCE_ID_IMAGE_HOUR_ROTOR_BLACK, &hour_hand_image_container);
+rotbmp_pair_layer_set_src_ic(&hour_hand_image_container.layer, GPoint(55, 55));
+layer_add_child(&window.layer, &hour_hand_image_container.layer.layer);
 
-  layer_add_child(&window.layer, &hour_hand_image_container.layer.layer);
-
-
-  // Set up a layer for the minute hand
-  //rotbmp_init_container(RESOURCE_ID_IMAGE_MINUTE_ROTOR, &minute_hand_image_container);
-  rotbmp_init_container(RESOURCE_ID_IMAGE_HAND_ROTOR, &minute_hand_image_container);
-
-  minute_hand_image_container.layer.compositing_mode = GCompOpOr;
-
-  rot_bitmap_set_src_ic(&minute_hand_image_container.layer, GPoint(111, 111));
-
-  layer_add_child(&window.layer, &minute_hand_image_container.layer.layer);
-
-
-  // Setup the black and white circle in the centre of the watch face
-  // (We use a bitmap rather than just drawing it because it means not having
-  // to stuff around with working out the circle center etc.)
-  //rotbmp_pair_init_container(RESOURCE_IMAGE_CENTER_CIRCLE_WHITE, RESOURCE_IMAGE_CENTER_CIRCLE_BLACK,
-	//		     &center_circle_image_container);
-
-  // TODO: Do this properly with a GRect().
-  // (144 = screen width, 168 = screen height)
-  //center_circle_image_container.layer.layer.frame.origin.x = (144/2) - (center_circle_image_container.layer.layer.frame.size.w/2);
-  //center_circle_image_container.layer.layer.frame.origin.y = (168/2) - (center_circle_image_container.layer.layer.frame.size.h/2);
-
-  //layer_add_child(&window.layer, &center_circle_image_container.layer.layer);
+PblTm t;
+get_time(&t);
+update_watch(&t);
 
 }
 
 void handle_deinit(AppContextRef ctx) {
-	
-  rotbmp_deinit_container(&hour_hand_image_container);
-  rotbmp_deinit_container(&minute_hand_image_container);
-  //rotbmp_pair_deinit_container(&center_circle_image_container);
+
+bmp_deinit_container(&background_image_container);
+rotbmp_pair_deinit_container(&minute_hand_image_container);
+rotbmp_pair_deinit_container(&hour_hand_image_container);
 }
 
 
+// The main event/run loop for our app
 void pbl_main(void *params) {
   PebbleAppHandlers handlers = {
+
+    // Handle app start
     .init_handler = &handle_init,
     .deinit_handler = &handle_deinit,
 
+    // Handle time updates
     .tick_info = {
       .tick_handler = &handle_minute_tick,
       .tick_units = MINUTE_UNIT

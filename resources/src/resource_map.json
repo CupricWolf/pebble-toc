@@ -1,19 +1,24 @@
 {
     "media": [
         {
-            "defName": "IMAGE_HAND_ROTOR_2",
+            "defName": "IMAGE_MENU_ICON",
             "type": "png",
-            "file": "images/Rotor2.png"
+            "file": "images/Pebble-Toc_Menu_Icon.png"
         },
         {
-            "defName": "IMAGE_BACKGROUND_MASK",
+            "defName": "IMAGE_BACKGROUND",
             "type": "png",
-            "file": "images/Background_Mask.png"
+            "file": "images/Background.png"
         },
         {
-            "defName": "IMAGE_HAND_ROTOR",
-            "type": "png",
-            "file": "images/Rotor.png"
+            "defName": "IMAGE_HOUR_ROTOR",
+            "type": "png-trans",
+            "file": "images/Hour_Rotor.png"
+        },
+        {
+            "defName": "IMAGE_MINUTE_ROTOR",
+            "type": "png-trans",
+            "file": "images/Minute_Rotor.png"
         }
     ],
     "friendlyVersion": "VERSION",
